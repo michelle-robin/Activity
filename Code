@@ -1,0 +1,42 @@
+from PIL import Image, ImageDraw, ImageFont
+
+# Canvas setup
+size = 1000
+img = Image.new("RGB", (size, size), (0, 0, 0))
+draw = ImageDraw.Draw(img)
+
+# Pink circle background
+draw.ellipse([(0, 0), (size, size)], fill=(255, 20, 147))
+
+# Black inner circle
+margin = 120
+draw.ellipse([(margin, margin), (size - margin, size - margin)], fill=(0, 0, 0))
+
+# Load mascot
+try:
+    mascot = Image.open("phantoms.png").convert("RGBA")
+    mascot = mascot.resize((600, 600))
+    mask = Image.new("L", mascot.size, 0)
+    mask_draw = ImageDraw.Draw(mask)
+    mask_draw.ellipse([(0, 0), mascot.size], fill=255)
+    x = (size - mascot.width) // 2
+    y = (size - mascot.height) // 2
+    img.paste(mascot, (x, y), mask)
+except FileNotFoundError:
+    print("Phantoms.png not found, skipping mascot")
+
+# Set huge fonts
+try:
+    font_small = ImageFont.truetype("arialbd.ttf", 500) # Slogan bigger
+except:
+    font_small = ImageFont.load_default()
+
+# Slogan
+slogan = "Unite in Sports, Excel as a Team!"
+bbox_s = draw.textbbox((0, 0), slogan, font=font_small)
+s_w, s_h = bbox_s[2] - bbox_s[0], bbox_s[3] - bbox_s[1]
+draw.text(((size - s_w) // 2, size - 150), slogan, font=font_small, fill=(255, 20, 147))
+
+# Save & show
+img.save("BSCS4_RobinMichelle_Activity1.png")
+img.show()
